@@ -1,65 +1,114 @@
-# Tarefas da disciplina de Engenharia de Sistemas Distribuídos
+# DistributedSystemsEngineering_UFPB
 
-**Aluno:** Gabriel.
+Repository for the assignments of the **Distributed Systems Engineering**
+course, Computer Science program at the Federal University of Paraíba
+(UFPB), semester 2026.2.
 
-## Estrutura
+- **Professor:** Raoni Kulesza
+- **Term:** P7 - 2026.2
+
+Two assignments so far, both centered on application security (Material
+2: Information Security). **Assignment 1** applies SAST and DAST to a
+small Express server, comparing an intentionally vulnerable version
+against a fixed one — the DAST is real: both servers are actually started
+and attacked over HTTP, not simulated. **Assignment 2** is the "GoFood"
+exercise: a SPA (React) + REST API (Node/Express) e-commerce app shipped
+with 20 seeded vulnerabilities (`V1`-`V20`), which we map to the OWASP Top
+10 (2021), analyze as concrete attacks (XSS token theft, SQL injection),
+and fix module by module (auth, orders, server config, frontend), closing
+with a sequence diagram, a defense-in-depth architecture discussion, and a
+DevSecOps pipeline proposal.
+
+## Author
+
+[<img src="https://github.com/gabrielbribeiroo.png?size=100" width=100><br><sub>Gabriel Ribeiro</sub>](https://github.com/gabrielbribeiroo)
+
+## Assignments
+
+| #  | Topic                                              | Directory                                            | Status    |
+| -- | --------------------------------------------------- | ----------------------------------------------------- | --------- |
+| 1  | SAST & DAST on a server, before/after a fix          | [`tarefa1-sast-dast/`](./tarefa1-sast-dast)           | Delivered |
+| 2  | GoFood — SPA Security Exercise (OWASP Top 10, Q1-Q10)| [`tarefa2-exercicio/`](./tarefa2-exercicio)           | Delivered |
+
+Each directory contains its own `README.md` with usage instructions, plus
+the reports/answers for that assignment.
+
+## Layout
 
 ```
-.
-├── tarefa1-sast-dast/     # Tarefa 1: aplicar SAST e DAST no servidor (antes/depois)
-│   ├── TAREFA1-SAST-DAST.md    # relatório: 11 achados SAST / 9-9 → 0-10 no DAST
-│   ├── vuln/  fixed/            # dois servidores executáveis (Express + db mock)
-│   ├── dast_probe*.py           # probes DAST (atacam a app rodando de verdade)
-│   ├── *-dast.json              # resultados DAST
-│   └── rules.yml, sast_scan.js, sast-*.json   # SAST (scanner próprio, estilo Semgrep)
-│
-└── tarefa2-exercicio/     # Tarefa 2: exercício GoFood Q1–Q10
-    ├── README.md               # descrição do repositório do exercício
+DistributedSystemsEngineering_UFPB/
+├── README.md                      # this file
+├── .gitignore
+├── tarefa1-sast-dast/              # Assignment 1 - SAST & DAST, before/after
+│   ├── README.md
+│   ├── TAREFA1-SAST-DAST.md        # report: 11 SAST findings / 9-9 -> 0-10 in DAST
+│   ├── rules.yml                   # SAST rules (regex-based, Semgrep-style)
+│   ├── sast_scan.js                # SAST scanner (no semgrep binary available)
+│   ├── dast_probe.py               # DAST probe against the vulnerable server
+│   ├── dast_probe_fixed.py         # DAST probe against the fixed server
+│   ├── sast-vuln-results.json / sast-fixed-results.json
+│   ├── vuln-dast.json / fixed-dast.json
+│   ├── vuln/                       # vulnerable server (Express + in-memory db mock)
+│   └── fixed/                      # fixed server (bcrypt, JWT expiry, cookies, zod, helmet...)
+└── tarefa2-exercicio/               # Assignment 2 - GoFood security exercise
+    ├── README.md
     ├── docs/
-    │   ├── 01-solucao-exercicio.md          # respostas Q1–Q10
-    │   └── 02-relatorio-sast-comparativo.md # relatório SAST (com limitações)
-    ├── backend/  frontend/     # código corrigido (Q4–Q7)
-    ├── sonar-project.properties             # pipeline DevSecOps (Q10)
-    └── analise-seguranca/      # regras + resultados + código vulnerável
+    │   ├── 01-solucao-exercicio.md          # Q1-Q10 answers
+    │   └── 02-relatorio-sast-comparativo.md # comparative SAST report (with limitations)
+    ├── backend/                    # fixed backend (Q4, Q5, Q7)
+    ├── frontend/src/App.jsx        # fixed frontend SPA (Q6)
+    ├── analise-seguranca/
+    │   ├── codigo-vulneravel/      # original vulnerable code from the assignment sheet
+    │   ├── rules.yml
+    │   ├── vulneravel-results.json / corrigido-results.json
+    └── sonar-project.properties    # SonarCloud config (Q10 - DevSecOps pipeline)
 ```
 
-## As duas tarefas
+## Quick start
 
-**Tarefa 1 — SAST e DAST no servidor, antes e depois.**
-Análise estática (scanner próprio baseado em regras, estilo Semgrep) **e
-dinâmica de verdade** (os dois servidores — vulnerável e corrigido — foram
-subidos localmente com banco em memória mockado e atacados via requisições
-HTTP reais). Resultado: 11 achados SAST e 9/9 vetores DAST exploráveis no
-código vulnerável, reduzidos a 0 no código corrigido. Um achado extra —
-não previsto no enunciado — foi descoberto durante o DAST: falta de
-validação de input derruba o processo inteiro do servidor (DoS). Detalhes
-e reprodução em `tarefa1-sast-dast/TAREFA1-SAST-DAST.md`.
+Each subdirectory is self-contained and has its own `README.md` with
+detailed instructions. The common cases:
 
-**Tarefa 2 — Exercício GoFood (Q1–Q10).**
-Mapeamento OWASP das 20 vulnerabilidades, análise dos ataques (XSS, SQLi),
-código corrigido (auth, orders, server, SPA), diagrama de sequência,
-análise arquitetural defense-in-depth e pipeline DevSecOps. Respostas em
-`tarefa2-exercicio/docs/01-solucao-exercicio.md`.
+```sh
+# Assignment 1 — install deps for both servers
+cd tarefa1-sast-dast/vuln  && npm install && cd ../fixed && npm install && cd ..
 
-## Metodologia e limitações (transparência)
+# Assignment 1 — run the custom SAST scanner (Semgrep-style regex rules)
+node sast_scan.js vuln  sast-vuln-results.json
+node sast_scan.js fixed sast-fixed-results.json
 
-O SAST rodou com um scanner próprio baseado em regras (`sast_scan.js` +
-`rules.yml`), no mesmo princípio do Semgrep, porque o binário `semgrep` e
-o registry oficial de regras não estavam acessíveis no ambiente usado para
-montar este repositório. O **SonarCloud está configurado
-(`sonar-project.properties`), mas não foi executado** — roda no CI após o
-push. O **DAST foi executado de fato**, subindo os servidores localmente
-com banco em memória mockado e atacando-os com `dast_probe.py` /
-`dast_probe_fixed.py`. Detalhes na seção de metodologia de
-`tarefa1-sast-dast/TAREFA1-SAST-DAST.md` e em
-`tarefa2-exercicio/docs/02-relatorio-sast-comparativo.md`.
+# Assignment 1 — run DAST against the vulnerable server (real HTTP attacks)
+node vuln/server.js &
+python dast_probe.py http://localhost:3001 vuln-dast.json
 
-## Ferramentas de pentest de referência
+# Assignment 1 — run DAST against the fixed server
+node fixed/server.js &
+python dast_probe_fixed.py http://localhost:3002 fixed-dast.json
 
-OWASP ZAP · Burp Suite · SpiderFoot · SqlMap — ver uso de cada uma na
-seção Q10 de `tarefa2-exercicio/docs/01-solucao-exercicio.md`.
+# Assignment 2 — run the fixed GoFood backend
+cd tarefa2-exercicio/backend
+npm install
+node server.js   # http://localhost:3002 (in-memory db mock)
+```
 
-## Nota sobre uso de IA
+## Tech stack
 
-Parte deste material foi produzida com apoio de assistente de IA (Claude)
-e revisada pelo autor.
+- **Node.js / Express** for both server implementations (vulnerable and
+  fixed), with an in-memory mock database so nothing depends on a real
+  Postgres/MySQL instance.
+- **jsonwebtoken**, **bcryptjs**, **zod**, **helmet**,
+  **express-rate-limit**, **cookie-parser**, **cors** for the security
+  fixes (Assignment 2, Q4-Q7).
+- **React** + **DOMPurify** for the fixed SPA frontend.
+- **Python 3** (standard library only) for the DAST probes.
+- A small **custom SAST scanner** (`sast_scan.js`, regex-based rules in
+  `rules.yml`) used in place of Semgrep, whose binary/rule registry
+  wasn't reachable in the environment this repo was built in — see the
+  methodology note in `tarefa1-sast-dast/README.md`.
+- **OWASP ZAP**, **Burp Suite**, **SpiderFoot**, **SqlMap** referenced as
+  pentest tooling in the DevSecOps pipeline discussion (Assignment 2, Q10).
+
+## Note on AI usage
+
+Part of this material was produced with the help of an AI assistant
+(Claude) and reviewed by the author.
