@@ -1,3 +1,5 @@
+// server.js — versão CORRIGIDA do bootstrap (ver ../vuln/server.js para a
+// forma original, sem nenhuma dessas camadas).
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -10,6 +12,7 @@ const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 const ALLOWED_ORIGIN = process.env.SPA_ORIGIN || 'http://localhost:5173';
 
+// headers de segurança padrão + CSP restritiva
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -21,21 +24,25 @@ app.use(helmet({
       frameAncestors: ["'none'"],
     },
   },
-})); // mitiga V19 (ausência de helmet)
+}));
 
-app.use(cors({ origin: ALLOWED_ORIGIN, credentials: true })); // mitiga V16 (CORS aberto)
-app.use(express.json({ limit: '16kb' })); // mitiga V17 (sem limite de tamanho)
+// única origem permitida, com suporte a cookies cross-site
+app.use(cors({ origin: ALLOWED_ORIGIN, credentials: true }));
+// corpo JSON limitado a 16kb — nada de payloads gigantes esgotando o processo
+app.use(express.json({ limit: '16kb' }));
 app.use(cookieParser());
 
 const globalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300 });
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
-app.use('/api', globalLimiter); // mitiga V18 (sem rate limiting)
+app.use('/api', globalLimiter);
+// limite mais apertado só para o login, onde brute force importa mais
 app.use('/api/login', loginLimiter);
 
 app.use('/api', authRouter);
 app.use('/api', ordersRouter);
 
-// V20 — error handler não expõe stack trace em produção
+// resposta de erro genérica em produção — quem chama não recebe stack
+// trace nem nada que revele detalhes internos do servidor.
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ error: isProd ? 'Erro interno do servidor' : err.message });

@@ -13,7 +13,7 @@ const path = require('path');
 // completo (sem instalar js-yaml). Mantenha as duas em sincronia manualmente.
 function loadRules() {
   return [
-    { id: 'hardcoded-jwt-secret', pattern: /SECRET\s*=\s*["'].+["']/i, message: "Secret JWT hardcoded no código-fonte (V1)", owasp: "A02:2021 - Cryptographic Failures", severity: "HIGH" },
+    { id: 'hardcoded-jwt-secret', pattern: /(SECRET|SIGNING_KEY)\s*=\s*["'].+["']/i, message: "Secret/chave de assinatura JWT hardcoded no código-fonte (V1)", owasp: "A02:2021 - Cryptographic Failures", severity: "HIGH" },
     { id: 'sql-string-concat-template', pattern: /(SELECT|INSERT|UPDATE|DELETE).*\$\{/i, message: "Query SQL montada por concatenação/template string (V2/V6/V9)", owasp: "A03:2021 - Injection", severity: "HIGH" },
     { id: 'jwt-sign-no-expiry', pattern: { test: (line) => /jwt\.sign\(/.test(line) && !/expiresIn/.test(line) }, message: "jwt.sign sem opção expiresIn — token não expira (V3)", owasp: "A07:2021 - Identification and Authentication Failures", severity: "MEDIUM" },
     { id: 'auth-header-token', pattern: /req\.headers\.authorization/, message: "Token lido diretamente do header Authorization, sem cookie HttpOnly (V5/V12)", owasp: "A05:2021 - Security Misconfiguration", severity: "MEDIUM" },

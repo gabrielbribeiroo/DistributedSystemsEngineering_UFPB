@@ -1,5 +1,7 @@
-// Banco de dados em memória (mock) — usado só para permitir rodar o servidor localmente
-// sem depender de Postgres/MySQL real. Simula uma tabela `users` e `orders`.
+// Stand-in de banco de dados: não há Postgres/MySQL real aqui, só um array
+// em memória com uma "interpretação" ingênua da string SQL recebida — o
+// suficiente para reproduzir, sem infraestrutura extra, o comportamento que
+// um driver real teria diante de uma query montada por concatenação.
 const users = [
   { id: 1, email: 'admin@gofood.com', password: 'admin123', role: 'admin' },
   { id: 2, email: 'joao@gofood.com', password: 'senha123', role: 'customer' },
@@ -10,18 +12,20 @@ const orders = [
   { id: 2, user_id: 1, items: '[{"productId":2,"qty":1}]', total: 15.0, address: 'Rua B, 456' },
 ];
 
-// query() simula um driver SQL "cru": se receber uma string (concatenada) ela é
-// interpretada de forma ingênua, o que é EXATAMENTE o comportamento vulnerável
-// (equivalente ao que um driver real faria com uma query construída por concatenação).
+// A função abaixo não faz parsing SQL de verdade — ela só reconhece os
+// padrões de query que auth.js/orders.js efetivamente emitem e devolve um
+// resultado condizente, inclusive quando esse SQL foi manipulado por injeção.
 function query(sql) {
   const lower = sql.toLowerCase();
 
   if (lower.includes('from users')) {
-    // Simula injeção: se a cláusula WHERE contém "or '1'='1'" ou "or 1=1", retorna o primeiro usuário
+    // Tautologia clássica de bypass de login (`OR '1'='1'`): devolve o
+    // primeiro registro, como uma query real faria com essa WHERE sempre-verdadeira.
     if (/or\s+'?1'?\s*=\s*'?1'?/i.test(sql)) {
       return [users[0]];
     }
-    // Simula UNION SELECT vazando a tabela users inteira
+    // UNION SELECT: expõe a tabela inteira, como aconteceria num banco real
+    // se as colunas da query injetada baterem com as da query original.
     if (/union\s+select/i.test(sql)) {
       return users.map(u => ({ id: u.id, email: u.email, password: u.password, role: u.role }));
     }

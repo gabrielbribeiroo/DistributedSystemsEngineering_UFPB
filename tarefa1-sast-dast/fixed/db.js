@@ -1,5 +1,7 @@
-// Banco de dados em memória (mock) com API PARAMETRIZADA (text, params) — simula
-// o driver `pg` real (db.query('...$1...', [valor])), eliminando concatenação de string.
+// Mesma ideia do db.js vulnerável (mock em memória, sem Postgres real), mas
+// com uma assinatura query(text, params) que imita o driver `pg` de verdade
+// — os valores nunca viram parte literal da string, então não há como uma
+// entrada do usuário mudar a estrutura da "query".
 const bcrypt = require('bcryptjs');
 
 const users = [
@@ -18,9 +20,6 @@ let orders = [
 
 let refreshTokens = []; // { userId, tokenHash, revoked, expiresAt }
 
-// query(text, params) — nunca faz concatenação; params são usados apenas como
-// dados, nunca interpolados na "query". Isso é o que torna SQL Injection impossível
-// aqui: um valor como "' OR '1'='1" é tratado só como valor de comparação, não como SQL.
 function query(text, params = []) {
   if (text.includes('SELECT id, email, password_hash, role FROM users WHERE email')) {
     const [email] = params;

@@ -1,3 +1,5 @@
+// auth.js — versão CORRIGIDA. Cada bloco abaixo neutraliza a vulnerabilidade
+// equivalente encontrada em ../vuln/auth.js (comentada como referência).
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -5,7 +7,9 @@ const crypto = require('crypto');
 const db = require('./db');
 const router = express.Router();
 
-const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'dev-only-change-me-access'; // V1 — via env
+// (corrige V1) nada de chave em texto no código: ela vem do ambiente, com um
+// fallback só para desenvolvimento local (nunca aponta para produção).
+const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'dev-only-change-me-access';
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dev-only-change-me-refresh';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -17,21 +21,24 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'Credenciais inválidas' });
   }
 
-  // V2 — query parametrizada, sem concatenação
+  // (corrige V2) a query usa placeholder ($1) — o email nunca é concatenado
+  // na string SQL, então um valor como `' OR '1'='1` vira só um valor de busca.
   const { rows } = db.query(
     'SELECT id, email, password_hash, role FROM users WHERE email = $1',
     [email]
   );
   const user = rows[0];
 
-  // Sempre roda bcrypt.compare (mesmo sem usuário) para não vazar timing/enumeração
+  // bcrypt.compare roda mesmo quando o usuário não existe (contra um hash
+  // "morto"), para o tempo de resposta não denunciar se o e-mail é válido.
   const validHash = user ? user.password_hash : '$2a$10$invalidinvalidinvalidinvalidinvalidinva';
   const passwordOk = await bcrypt.compare(password, validHash);
   if (!user || !passwordOk) {
     return res.status(401).json({ error: 'Credenciais inválidas' });
   }
 
-  // V3 — expiração curta no access token
+  // (corrige V3) expiração curta e explícita — depois de 15 minutos o token
+  // deixa de ser aceito mesmo que ninguém o revogue manualmente.
   const accessToken = jwt.sign({ userId: user.id, role: user.role }, ACCESS_SECRET, { expiresIn: '15m' });
   const refreshToken = jwt.sign({ userId: user.id, jti: crypto.randomUUID() }, REFRESH_SECRET, { expiresIn: '7d' });
 
@@ -41,7 +48,8 @@ router.post('/login', async (req, res) => {
   res.cookie('accessToken', accessToken, { ...COOKIE_OPTS, maxAge: 15 * 60 * 1000 });
   res.cookie('refreshToken', refreshToken, { ...COOKIE_OPTS, maxAge: 7 * 24 * 3600 * 1000 });
 
-  // V4 — não expõe token/role no corpo
+  // (corrige V4) a resposta não carrega token nem role — o cliente só sabe
+  // que autenticou; os dados de sessão ficam inteiramente nos cookies.
   res.json({ success: true });
 });
 
@@ -68,7 +76,9 @@ router.post('/refresh', async (req, res) => {
 });
 
 function authMiddleware(req, res, next) {
-  const token = req.cookies && req.cookies.accessToken; // V5 — lê do cookie, não do header
+  // (corrige V5) lê o cookie HttpOnly, não um header que qualquer script
+  // JS poderia inspecionar ou que um cliente mal-formado poderia omitir.
+  const token = req.cookies && req.cookies.accessToken;
   if (!token) return res.status(401).json({ error: 'Não autenticado' });
   try {
     req.user = jwt.verify(token, ACCESS_SECRET);

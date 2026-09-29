@@ -5,8 +5,8 @@
 
 rules:
   - id: hardcoded-jwt-secret
-    pattern: "SECRET\\s*=\\s*[\"'].+[\"']"
-    message: "Secret JWT hardcoded no código-fonte (V1)"
+    pattern: "(SECRET|SIGNING_KEY)\\s*=\\s*[\"'].+[\"']"
+    message: "Secret/chave de assinatura JWT hardcoded no código-fonte (V1)"
     owasp: "A02:2021 - Cryptographic Failures"
     severity: HIGH
 

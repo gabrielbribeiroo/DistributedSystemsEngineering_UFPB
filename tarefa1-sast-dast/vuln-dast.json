@@ -10,7 +10,7 @@
       "evidence": {
         "status": 200,
         "body": {
-          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZ29mb29kLmNvbSIsImlhdCI6MTc5MDYzMjA3N30.FtajRpHBzv5G9DYZbHW8G05D0sdw6dxGfhsVDjveuzE",
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZ29mb29kLmNvbSIsImlhdCI6MTc5MDY4MDMzMX0.MxT0-QLbhYoK2u_bENFI34GMmgPPGSSaMxQbpjuyvkk",
           "userId": 1,
           "role": "admin"
         }
@@ -22,7 +22,7 @@
       "exploitable": true,
       "evidence": {
         "body": {
-          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZ29mb29kLmNvbSIsImlhdCI6MTc5MDYzMjA3N30.FtajRpHBzv5G9DYZbHW8G05D0sdw6dxGfhsVDjveuzE",
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZ29mb29kLmNvbSIsImlhdCI6MTc5MDY4MDMzMX0.MxT0-QLbhYoK2u_bENFI34GMmgPPGSSaMxQbpjuyvkk",
           "userId": 1,
           "role": "admin"
         }
@@ -83,7 +83,7 @@
           401,
           401
         ],
-        "elapsed_s": 0.08
+        "elapsed_s": 0.06
       }
     },
     {
