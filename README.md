@@ -25,13 +25,15 @@ DevSecOps pipeline proposal.
 
 ## Assignments
 
-| #  | Topic                                              | Directory                                            | Status    |
-| -- | --------------------------------------------------- | ----------------------------------------------------- | --------- |
-| 1  | SAST & DAST on a server, before/after a fix          | [`tarefa1-sast-dast/`](./tarefa1-sast-dast)           | Delivered |
-| 2  | GoFood — SPA Security Exercise (OWASP Top 10, Q1-Q10)| [`tarefa2-exercicio/`](./tarefa2-exercicio)           | Delivered |
+| #  | Topic                                              | Directory                                            | Zip                                            | Status    |
+| -- | --------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------- | --------- |
+| 1  | SAST & DAST on a server, before/after a fix          | [`tarefa1-sast-dast/`](./tarefa1-sast-dast)           | [`tarefa1-sast-dast.zip`](./tarefa1-sast-dast.zip) | Delivered |
+| 2  | GoFood — SPA Security Exercise (OWASP Top 10, Q1-Q10)| [`tarefa2-exercicio/`](./tarefa2-exercicio)           | [`tarefa2-exercicio.zip`](./tarefa2-exercicio.zip) | Delivered |
 
 Each directory contains its own `README.md` with usage instructions, plus
-the reports/answers for that assignment.
+the reports/answers for that assignment. A `.zip` snapshot of each
+assignment's folder (source excluded from `node_modules/`) is also kept at
+the repository root, for anyone who wants the files without cloning.
 
 ## Layout
 
@@ -39,6 +41,8 @@ the reports/answers for that assignment.
 DistributedSystemsEngineering_UFPB/
 ├── README.md                      # this file
 ├── .gitignore
+├── tarefa1-sast-dast.zip           # zip snapshot of tarefa1-sast-dast/
+├── tarefa2-exercicio.zip           # zip snapshot of tarefa2-exercicio/
 ├── tarefa1-sast-dast/              # Assignment 1 - SAST & DAST, before/after
 │   ├── README.md
 │   ├── TAREFA1-SAST-DAST.md        # report: 11 SAST findings / 9-9 -> 0-10 in DAST
