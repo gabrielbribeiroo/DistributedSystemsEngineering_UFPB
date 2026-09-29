@@ -1,0 +1,107 @@
+{
+  "tool": "mini-sast (regex, estilo Semgrep)",
+  "target": "vuln",
+  "timestamp": "2026-09-28T21:45:55.509Z",
+  "total_findings": 11,
+  "findings": [
+    {
+      "rule_id": "hardcoded-jwt-secret",
+      "path": "vuln\\auth.js",
+      "line": 6,
+      "message": "Secret JWT hardcoded no código-fonte (V1)",
+      "owasp": "A02:2021 - Cryptographic Failures",
+      "severity": "HIGH",
+      "snippet": "const SECRET = \"gofood2024secret\"; // V1 — secret hardcoded no código-fonte"
+    },
+    {
+      "rule_id": "sql-string-concat-template",
+      "path": "vuln\\auth.js",
+      "line": 12,
+      "message": "Query SQL montada por concatenação/template string (V2/V6/V9)",
+      "owasp": "A03:2021 - Injection",
+      "severity": "HIGH",
+      "snippet": "const query = `SELECT * FROM users WHERE email = '${email}' AND password = '${password}'`;"
+    },
+    {
+      "rule_id": "plaintext-password-in-query",
+      "path": "vuln\\auth.js",
+      "line": 12,
+      "message": "Senha comparada em texto claro dentro da query, sem hashing (V2)",
+      "owasp": "A02:2021 - Cryptographic Failures",
+      "severity": "HIGH",
+      "snippet": "const query = `SELECT * FROM users WHERE email = '${email}' AND password = '${password}'`;"
+    },
+    {
+      "rule_id": "jwt-sign-no-expiry",
+      "path": "vuln\\auth.js",
+      "line": 21,
+      "message": "jwt.sign sem opção expiresIn — token não expira (V3)",
+      "owasp": "A07:2021 - Identification and Authentication Failures",
+      "severity": "MEDIUM",
+      "snippet": "const token = jwt.sign("
+    },
+    {
+      "rule_id": "auth-header-token",
+      "path": "vuln\\auth.js",
+      "line": 31,
+      "message": "Token lido diretamente do header Authorization, sem cookie HttpOnly (V5/V12)",
+      "owasp": "A05:2021 - Security Misconfiguration",
+      "severity": "MEDIUM",
+      "snippet": "const token = req.headers.authorization; // V5 — sem validação de esquema (Bearer)"
+    },
+    {
+      "rule_id": "sql-string-concat-template",
+      "path": "vuln\\orders.js",
+      "line": 9,
+      "message": "Query SQL montada por concatenação/template string (V2/V6/V9)",
+      "owasp": "A03:2021 - Injection",
+      "severity": "HIGH",
+      "snippet": "const order = db.query(`SELECT * FROM orders WHERE id = ${req.params.id}`);"
+    },
+    {
+      "rule_id": "sql-string-concat-template",
+      "path": "vuln\\orders.js",
+      "line": 20,
+      "message": "Query SQL montada por concatenação/template string (V2/V6/V9)",
+      "owasp": "A03:2021 - Injection",
+      "severity": "HIGH",
+      "snippet": "db.query(`INSERT INTO orders (user_id, items, total, address) VALUES (${req.user.userId}, '${JSON.stringify(items)}', ${total}, '${address}')`);"
+    },
+    {
+      "rule_id": "admin-route-no-role-check",
+      "path": "vuln\\orders.js",
+      "line": 25,
+      "message": "Rota /admin sem middleware de checagem de role antes do handler (V10)",
+      "owasp": "A01:2021 - Broken Access Control",
+      "severity": "HIGH",
+      "snippet": "router.get('/admin/orders', authMiddleware, async (req, res) => {"
+    },
+    {
+      "rule_id": "cors-open",
+      "path": "vuln\\server.js",
+      "line": 7,
+      "message": "cors() chamado sem opções — aceita qualquer origem (V16)",
+      "owasp": "A05:2021 - Security Misconfiguration",
+      "severity": "MEDIUM",
+      "snippet": "app.use(cors()); // V16 — aceita qualquer origem"
+    },
+    {
+      "rule_id": "json-body-no-limit",
+      "path": "vuln\\server.js",
+      "line": 8,
+      "message": "express.json() sem limite de tamanho (V17)",
+      "owasp": "A05:2021 - Security Misconfiguration",
+      "severity": "LOW",
+      "snippet": "app.use(express.json()); // V17 — sem limite de tamanho"
+    },
+    {
+      "rule_id": "error-handler-exposes-stack",
+      "path": "vuln\\server.js",
+      "line": 20,
+      "message": "Error handler retorna err.stack ao cliente (V20)",
+      "owasp": "A05:2021 - Security Misconfiguration",
+      "severity": "MEDIUM",
+      "snippet": "stack: err.stack,"
+    }
+  ]
+}

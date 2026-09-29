@@ -1,0 +1,118 @@
+{
+  "target": "http://localhost:3001",
+  "total_checks": 9,
+  "exploitable": 9,
+  "results": [
+    {
+      "id": "V2",
+      "description": "SQL Injection no login (' OR '1'='1' --)",
+      "exploitable": true,
+      "evidence": {
+        "status": 200,
+        "body": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZ29mb29kLmNvbSIsImlhdCI6MTc5MDYzMjA3N30.FtajRpHBzv5G9DYZbHW8G05D0sdw6dxGfhsVDjveuzE",
+          "userId": 1,
+          "role": "admin"
+        }
+      }
+    },
+    {
+      "id": "V4",
+      "description": "Role exposta no corpo da resposta de login",
+      "exploitable": true,
+      "evidence": {
+        "body": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImVtYWlsIjoiYWRtaW5AZ29mb29kLmNvbSIsImlhdCI6MTc5MDYzMjA3N30.FtajRpHBzv5G9DYZbHW8G05D0sdw6dxGfhsVDjveuzE",
+          "userId": 1,
+          "role": "admin"
+        }
+      }
+    },
+    {
+      "id": "V6",
+      "description": "UNION SELECT na rota /orders/:id vaza tabela users",
+      "exploitable": true,
+      "evidence": {
+        "status": 200,
+        "body": [
+          {
+            "id": 1,
+            "email": "admin@gofood.com",
+            "password": "admin123",
+            "role": "admin"
+          },
+          {
+            "id": 2,
+            "email": "joao@gofood.com",
+            "password": "senha123",
+            "role": "customer"
+          }
+        ]
+      }
+    },
+    {
+      "id": "V10",
+      "description": "Usuário comum acessa /api/admin/orders",
+      "exploitable": true,
+      "evidence": {
+        "status": 200
+      }
+    },
+    {
+      "id": "V16",
+      "description": "CORS aceita Origin arbitrária (checagem indireta via ausência de bloqueio)",
+      "exploitable": true,
+      "evidence": {
+        "note": "sem cabeçalho Access-Control-Allow-Origin restrito no servidor vuln"
+      }
+    },
+    {
+      "id": "V18",
+      "description": "10 tentativas de login em sequência sem bloqueio (rate limiting)",
+      "exploitable": true,
+      "evidence": {
+        "statuses": [
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401,
+          401
+        ],
+        "elapsed_s": 0.08
+      }
+    },
+    {
+      "id": "V9",
+      "description": "Servidor aceita price definido pelo cliente no corpo do pedido",
+      "exploitable": true,
+      "evidence": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      }
+    },
+    {
+      "id": "V20",
+      "description": "Erro 500/400 (JSON malformado) expõe stack trace no corpo da resposta",
+      "exploitable": true,
+      "evidence": {
+        "status": 500,
+        "has_stack": true
+      }
+    },
+    {
+      "id": "V8-DoS",
+      "description": "Requisição sem validação de input derruba o processo do servidor (crash / indisponibilidade)",
+      "exploitable": true,
+      "evidence": {
+        "note": "TypeError não tratada em handler async gera unhandled promise rejection e mata o processo Node"
+      }
+    }
+  ]
+}

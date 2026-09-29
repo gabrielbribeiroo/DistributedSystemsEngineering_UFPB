@@ -1,0 +1,15 @@
+{
+  "name": "gofood-vuln",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Servidor GoFood no estado vulnerável (V1-V20), para fins de estudo de SAST/DAST.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

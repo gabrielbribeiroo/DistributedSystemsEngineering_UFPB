@@ -1,0 +1,7 @@
+{
+  "tool": "mini-sast (regex, estilo Semgrep)",
+  "target": "fixed",
+  "timestamp": "2026-09-28T21:45:55.612Z",
+  "total_findings": 0,
+  "findings": []
+}

@@ -1,0 +1,126 @@
+{
+  "target": "http://localhost:3002",
+  "total_checks": 10,
+  "exploitable": 0,
+  "results": [
+    {
+      "id": "V2",
+      "description": "SQL Injection no login (' OR '1'='1' --)",
+      "exploitable": false,
+      "evidence": {
+        "status": 401,
+        "body": {
+          "error": "Credenciais inválidas"
+        }
+      }
+    },
+    {
+      "id": "V4",
+      "description": "Token/role expostos no corpo da resposta de login",
+      "exploitable": false,
+      "evidence": {
+        "status": 200,
+        "body": {
+          "success": true
+        }
+      }
+    },
+    {
+      "id": "V10",
+      "description": "Usuário comum acessa /api/admin/orders",
+      "exploitable": false,
+      "evidence": {
+        "status": 403
+      }
+    },
+    {
+      "id": "V7",
+      "description": "Usuário comum lê pedido de outro usuário (IDOR)",
+      "exploitable": false,
+      "evidence": {
+        "status": 404,
+        "body": {
+          "error": "Pedido não encontrado"
+        }
+      }
+    },
+    {
+      "id": "V16",
+      "description": "CORS aceita Origin arbitrária",
+      "exploitable": false,
+      "evidence": {
+        "Access-Control-Allow-Origin": "http://localhost:5173"
+      }
+    },
+    {
+      "id": "V18",
+      "description": "10 tentativas de login em sequência sem bloqueio",
+      "exploitable": false,
+      "evidence": {
+        "statuses": [
+          401,
+          401,
+          429,
+          429,
+          429,
+          429,
+          429,
+          429,
+          429,
+          429
+        ]
+      }
+    },
+    {
+      "id": "V9",
+      "description": "Servidor aceita price definido pelo cliente",
+      "exploitable": false,
+      "evidence": {
+        "status": 201,
+        "body": {
+          "success": true,
+          "orderId": 2
+        },
+        "note": "preço é recalculado no servidor a partir do catálogo — não há como provar exploração sem inspecionar o total salvo"
+      }
+    },
+    {
+      "id": "V8",
+      "description": "Payload sem 'items' derruba o processo ou não é validado",
+      "exploitable": false,
+      "evidence": {
+        "status": 400,
+        "body": {
+          "error": "Dados inválidos",
+          "details": {
+            "formErrors": [],
+            "fieldErrors": {
+              "items": [
+                "Required"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "V8-DoS",
+      "description": "Processo derruba após payload inválido",
+      "exploitable": false,
+      "evidence": {
+        "status_after": 429
+      }
+    },
+    {
+      "id": "V20",
+      "description": "Erro expõe stack trace no corpo da resposta",
+      "exploitable": false,
+      "evidence": {
+        "status": 400,
+        "body": {
+          "error": "Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+        }
+      }
+    }
+  ]
+}
