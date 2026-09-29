@@ -1,5 +1,4 @@
-// server.js — versão CORRIGIDA do bootstrap (ver ../vuln/server.js para a
-// forma original, sem nenhuma dessas camadas).
+// versao corrigida do bootstrap, comparar com ../vuln/server.js
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -12,7 +11,7 @@ const app = express();
 const isProd = process.env.NODE_ENV === 'production';
 const ALLOWED_ORIGIN = process.env.SPA_ORIGIN || 'http://localhost:5173';
 
-// headers de segurança padrão + CSP restritiva
+// helmet com csp, resolve o V19
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -26,23 +25,22 @@ app.use(helmet({
   },
 }));
 
-// única origem permitida, com suporte a cookies cross-site
+// só a origem da SPA pode chamar a api agora (V16)
 app.use(cors({ origin: ALLOWED_ORIGIN, credentials: true }));
-// corpo JSON limitado a 16kb — nada de payloads gigantes esgotando o processo
+// limitei o tamanho do body em 16kb (V17)
 app.use(express.json({ limit: '16kb' }));
 app.use(cookieParser());
 
 const globalLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300 });
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
 app.use('/api', globalLimiter);
-// limite mais apertado só para o login, onde brute force importa mais
+// esse aqui mais restrito, só pro login (era o V18)
 app.use('/api/login', loginLimiter);
 
 app.use('/api', authRouter);
 app.use('/api', ordersRouter);
 
-// resposta de erro genérica em produção — quem chama não recebe stack
-// trace nem nada que revele detalhes internos do servidor.
+// não manda mais o stack no erro, só uma mensagem genérica se for prod (V20)
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ error: isProd ? 'Erro interno do servidor' : err.message });
@@ -50,7 +48,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3002;
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`[fixed] GoFood corrigido rodando em http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`[fixed] rodando em http://localhost:${PORT}`));
 }
 
 module.exports = app;

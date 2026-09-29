@@ -1,7 +1,5 @@
-// Mesma ideia do db.js vulnerável (mock em memória, sem Postgres real), mas
-// com uma assinatura query(text, params) que imita o driver `pg` de verdade
-// — os valores nunca viram parte literal da string, então não há como uma
-// entrada do usuário mudar a estrutura da "query".
+// mesmo mock do outro, mas agora com query(text, params) tipo o driver
+// do pg de verdade, os parametros nunca entram na string
 const bcrypt = require('bcryptjs');
 
 const users = [

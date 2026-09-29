@@ -11,11 +11,11 @@ function App() {
     const res = await fetch(`${API_BASE}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // envia/recebe o cookie HttpOnly
+      credentials: 'include', // pra mandar/receber o cookie
       body: JSON.stringify({ email, password }),
     });
     if (!res.ok) throw new Error('Falha no login');
-    // Nenhum token ou role é armazenado no cliente — tudo vive no cookie HttpOnly
+    // não guardo token nem role em lugar nenhum aqui, fica tudo no cookie
     await checkAdminAccess();
     setUser({ authenticated: true });
   }
@@ -24,15 +24,14 @@ function App() {
     const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include' });
     if (!res.ok) { setIsAdmin(false); return; }
     const data = await res.json();
-    // role vem do servidor a cada checagem — nunca é decisão do cliente
+    // pergunta pro servidor qual é o role, não decido isso no front
     setIsAdmin(data.role === 'admin');
   }
 
   useEffect(() => { checkAdminAccess(); }, []);
 
   function AdminPanel() {
-    // A UI só reflete o que o servidor autorizou; a rota /api/admin/* também
-    // reforça a checagem no backend (defesa em profundidade).
+    // isso aqui é só cosmético, quem realmente barra é o backend
     if (!isAdmin) return null;
     return <div>Painel Admin...</div>;
   }

@@ -1,7 +1,5 @@
-// Stand-in de banco de dados: não há Postgres/MySQL real aqui, só um array
-// em memória com uma "interpretação" ingênua da string SQL recebida — o
-// suficiente para reproduzir, sem infraestrutura extra, o comportamento que
-// um driver real teria diante de uma query montada por concatenação.
+// não tem banco de verdade, é só um mock em memória mesmo pra não precisar
+// instalar postgres só pra rodar isso localmente
 const users = [
   { id: 1, email: 'admin@gofood.com', password: 'admin123', role: 'admin' },
   { id: 2, email: 'joao@gofood.com', password: 'senha123', role: 'customer' },
@@ -12,20 +10,17 @@ const orders = [
   { id: 2, user_id: 1, items: '[{"productId":2,"qty":1}]', total: 15.0, address: 'Rua B, 456' },
 ];
 
-// A função abaixo não faz parsing SQL de verdade — ela só reconhece os
-// padrões de query que auth.js/orders.js efetivamente emitem e devolve um
-// resultado condizente, inclusive quando esse SQL foi manipulado por injeção.
+// não é um parser SQL de verdade, só reconhece os formatos de query que o
+// auth.js e o orders.js mandam e devolve algo coerente pra cada um
 function query(sql) {
   const lower = sql.toLowerCase();
 
   if (lower.includes('from users')) {
-    // Tautologia clássica de bypass de login (`OR '1'='1'`): devolve o
-    // primeiro registro, como uma query real faria com essa WHERE sempre-verdadeira.
+    // clássico bypass tipo OR '1'='1', devolve o primeiro user
     if (/or\s+'?1'?\s*=\s*'?1'?/i.test(sql)) {
       return [users[0]];
     }
-    // UNION SELECT: expõe a tabela inteira, como aconteceria num banco real
-    // se as colunas da query injetada baterem com as da query original.
+    // union select vaza a tabela de usuários inteira
     if (/union\s+select/i.test(sql)) {
       return users.map(u => ({ id: u.id, email: u.email, password: u.password, role: u.role }));
     }
